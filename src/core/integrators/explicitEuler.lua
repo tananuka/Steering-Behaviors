@@ -27,7 +27,7 @@ local function ExplicitEuler(agent, dt)
   agent.pos = agent.pos + agent.vel * dt
   agent.acc = agent.forceAccum * agent.invMass
   agent.vel = (agent.vel + agent.acc * dt):clamp(agent.maxVel)
-  agent.forceAccum:clear()  
+  agent.forceAccum:clear()
 end
 
 return ExplicitEuler

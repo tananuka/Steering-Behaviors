@@ -27,26 +27,26 @@ local factor = 1/6
 -- We compute at t+dt/2 a 4th-order derivative using Forward Euler
 local function rk4Eval(state,dt)
     local vel1 = state.vel
-    local acc1 = state.acc    
+    local acc1 = state.acc
     local vel2 = state.vel + acc1 * (dt*0.5)
-    local acc2 = state.acc    
+    local acc2 = state.acc
     local vel3 = state.vel + acc2 * (dt*0.5)
-    local acc3 = state.acc    
+    local acc3 = state.acc
     local vel4 = state.vel + acc3 * (dt)
-    local acc4 = state.acc    
+    local acc4 = state.acc
     local dpos = (vel1 + vel2 * 2 + vel3 * 2 + vel4) * (factor * dt)
     local dvel = (acc1 + acc2 * 2 + acc3 * 2 + acc4) * (factor * dt)
-    return dpos, dvel    
+    return dpos, dvel
 end
 
 -- Integration
--- Uses rk4Eval in a full Forward Euler step 
+-- Uses rk4Eval in a full Forward Euler step
 local function RK4(agent, dt)
   agent.acc = agent.forceAccum * agent.invMass
   local dP, dV = rk4Eval(agent,dt)
   agent.pos = agent.pos + dP
   agent.vel = (agent.vel + dV):clamp(agent.maxVel)
-  agent.forceAccum:clear()  
+  agent.forceAccum:clear()
 end
 
 return RK4

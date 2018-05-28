@@ -25,30 +25,30 @@ if (...) then
   local _PATH = (...):match('%w+%.')
   require (_PATH .. 'core.math')
   local Vec = require (_PATH .. 'core.vector')
-  
+
   local Zero = Vec()
-  
+
   local min, random, cos, sin, tau = math.min, math.random, math.cos, math.sin, math.tau
   local l2Abs, rSign = math.localToAbsoluteReference, math.randomSign
-  
+
   local SteeringBehaviour = {}
 
   function SteeringBehaviour.seek(agent,targetPos)
     local requiredVel = (targetPos - agent.pos):normalize() * agent.maxVel
-    return requiredVel - agent.vel  
+    return requiredVel - agent.vel
   end
 
   function SteeringBehaviour.flee(agent,targetPos, panicDistance)
     if panicDistance then
       if agent.pos:distSqTo(targetPos) < panicDistance * panicDistance then
         local requiredVel = (agent.pos - targetPos):normalize() * agent.maxVel
-        return requiredVel - agent.vel     
+        return requiredVel - agent.vel
       end
     end
-    return Zero   
+    return Zero
   end
-  
-  local DecelerationType = {slow = 3, normal = 2, fast = 1}  
+
+  local DecelerationType = {slow = 3, normal = 2, fast = 1}
   function SteeringBehaviour.arrive(agent, targetPos, typeDec)
     local vTarget = targetPos - agent.pos
     local distToTarget = vTarget:mag()
@@ -61,7 +61,7 @@ if (...) then
     end
     return Zero
   end
-  
+
   function SteeringBehaviour.pursuit(agent, runaway)
     local vRunaway = runaway.pos - agent.pos
     local relativeHeading = agent.velHeading:dot(runaway.velHeading)
@@ -71,23 +71,23 @@ if (...) then
     local predictTime = vRunaway:mag()/(agent.maxVel:mag()+runaway.vel:mag())
     return SteeringBehaviour.seek(agent,runaway.pos + runaway.vel * predictTime)
   end
-  
+
   function SteeringBehaviour.evade(agent,hunter)
     local vHunter = hunter.pos - agent.pos
-    local predictTime = vHunter:mag()/(agent.maxVel:mag() + hunter.vel:mag())    
+    local predictTime = vHunter:mag()/(agent.maxVel:mag() + hunter.vel:mag())
     return SteeringBehaviour.flee(agent, hunter.pos + hunter.vel * predictTime,100)
   end
-  
+
   function SteeringBehaviour.wander(agent, radius, distance, jitter)
     local jitterThisFrame = jitter * agent.dt
     local theta = random() * tau
     local targetPos = Vec(radius * cos(theta), radius * sin(theta))
     targetPos = targetPos + Vec((random()*rSign() * jitterThisFrame),
-                                (random()*rSign() * jitterThisFrame))    
+                                (random()*rSign() * jitterThisFrame))
     targetPos:normalize()
     targetPos = targetPos * radius
     local targetAtDist = targetPos + Vec(distance,0)
-       
+
     local newTargetPos = l2Abs(targetAtDist, agent.velHeading, agent.velPerp, agent.pos)
     --[[
     print('agentVelH', agent.velHeading)
@@ -97,9 +97,9 @@ if (...) then
     --io.read()
     --]]
     return newTargetPos - agent.pos
-    
-  
+
+
   end
-  
+
   return SteeringBehaviour
-end  
+end
